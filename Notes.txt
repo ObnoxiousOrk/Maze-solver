@@ -1,0 +1,12 @@
+Notes
+
+pathing order:
+down
+left
+right
+up
+
+save all junctions
+delete once revisited
+
+once a path has been visited and returned from, add a wall to prevent travel
