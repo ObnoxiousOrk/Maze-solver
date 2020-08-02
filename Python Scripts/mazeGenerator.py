@@ -54,4 +54,4 @@ findPath(vSize, vStart)
 
 
 
-# displayMaze(aMazeData)
+displayMaze(aMazeData)

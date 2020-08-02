@@ -30,4 +30,4 @@ def writeImage(aMaze, aMazeSolution):
 
 	img = Image.fromarray(data, 'RGB')
 	img.save('my.png')
-	img.show()
+	# img.show()

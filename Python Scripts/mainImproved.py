@@ -402,7 +402,7 @@ class MAZE():
 		# print()
 		# print("Connection:", aMazeNodes[1][5].aRight)
 
-		print("Connection:", aMazeNodes[1][7].aRight)
+		# print("Connection:", aMazeNodes[1][7].aRight)
 
 		self.displayMaze(aMazeNodes)
 
@@ -412,7 +412,7 @@ class MAZE():
 		self.displayMaze(aSolvedMaze)
 		# self.writeMaze(self.aMazeUnsolved, aSolvedMaze)
 
-maze = MAZE("../Mazes/MazeImprovedThiccWalls.png") #--Initilises an instance of the MAZE object with the path to the maze image
+maze = MAZE("../Mazes/20x20.png") #--Initilises an instance of the MAZE object with the path to the maze image
 maze.main() #--Runs the main method
 
 
