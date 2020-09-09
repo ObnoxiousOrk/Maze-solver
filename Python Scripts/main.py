@@ -1,7 +1,7 @@
 """
 Name: mazeSolver.py
 Date Start: 24/3/2020
-Date End: 
+Date End:
 
 0 = Walkable
 1 = Wall
@@ -112,7 +112,7 @@ class MAZE():
 					data[r][p] = [255, 255, 255] #--RGB value to be written and coords to be written to
 
 				elif aMaze[r][p] == 1:
-					data[r][p] = [0, 0, 0] 
+					data[r][p] = [0, 0, 0]
 
 				elif aMaze[r][p] == 2:
 					data[r][p] = [0, 255, 0]
