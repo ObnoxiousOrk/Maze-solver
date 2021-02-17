@@ -1,7 +1,7 @@
 """
 Name: mazeSolver.py
 Date Start: 24/3/2020
-Date End:
+Date End: June ish 2020
 
 0 = Walkable
 1 = Wall
@@ -124,7 +124,7 @@ class MAZE():
 					data[r][p] = [0, 0, 255]
 
 		img = Image.fromarray(data, "RGB") #--Construts an image from the array of RGB colour values
-		img.save("solvedMaze.png") #--Saves the image as solvedMaze.png
+		img.save("../Mazes/solvedMaze.png") #--Saves the image as solvedMaze.png
 		# img.show() #--Shows the image
 
 	def main(self):
@@ -136,5 +136,5 @@ class MAZE():
 		self.displayMaze(aSolvedMaze)
 		self.writeMaze(self.aMazeUnsolved, aSolvedMaze)
 
-maze = MAZE("../Mazes/MazeImproved.png") #--Initilises an instance of the MAZE object with the path to the maze image
+maze = MAZE("../Mazes/TestMaze2.png") #--Initilises an instance of the MAZE object with the path to the maze image
 maze.main() #--Runs the main method
