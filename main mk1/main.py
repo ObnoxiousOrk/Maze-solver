@@ -136,5 +136,5 @@ class MAZE():
 		self.displayMaze(aSolvedMaze)
 		self.writeMaze(self.aMazeUnsolved, aSolvedMaze)
 
-maze = MAZE("../Mazes/TestMaze2.png") #--Initilises an instance of the MAZE object with the path to the maze image
+maze = MAZE("../Mazes/ManipulatingBadCode.png") #--Initilises an instance of the MAZE object with the path to the maze image
 maze.main() #--Runs the main method

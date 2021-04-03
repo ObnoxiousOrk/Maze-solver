@@ -17,31 +17,12 @@ find corners and other nodes, connect, jump node to node to solve
 import copy
 import numpy as np
 from PIL import Image
+from readMaze import getMaze
+from writeMaze import writeImage
 
 class MAZE():
 	def __init__(self):
 		self.maze = []
-
-	def getMaze(self, source="Maze.png"): #--If no maze source is specified, the default is set to Maze.png
-		img = Image.open(source).convert("LA") #--Opens the maze image from the file path specified
-		aMaze = np.array(img) #--Converts the maze image into an array of colour values for each pixel
-
-		aBoolMaze = []
-
-
-		#--For each pixel in row in the array of colour values if the pixel is not white, it is a wall and is set to 1, and if it's white, it can be moved on and is set to 0
-		for row in aMaze:
-			aRow = [] #--At the beginning of every row of pixels, set the array containing information about that row to be blank
-			for pixel in row:
-				if pixel[0] == 0:
-					aRow.append(1)
-				else:
-					aRow.append(0)
-
-			aBoolMaze.append(aRow) #--Adds the completed row to the whole maze
-
-
-		return aBoolMaze
 
 	def findStartEnd(self, maze):
 		for i in range(len(maze[0])):
@@ -49,7 +30,7 @@ class MAZE():
 				# maze[0][i] = 2
 				vStart = [0, i]
 
-				maze[vStart[0]][vStart[1]] = NODE([vStart[0], vStart[1]], False, False, True, False)
+				maze[0][vStart[1]] = NODE([0, vStart[1]], False, False, True, False)
 
 		for i in range(len(maze[len(maze)-1])):
 			if maze[len(maze)-1][i] == 0: #--If the pixel that is being interrogated on the last line is walkable, it has to be the end, so set it to the end character
@@ -115,27 +96,83 @@ class MAZE():
 		return maze, aNodes
 
 	def findNodeConnections(self, aSimpleNodes): #--Might also find empty nodes? call multiple times?
-		nodesLeft = True
-		while nodesLeft:
-			for row in range(len(self.maze)): #--refresh the list of nodes before every node connection attempt
+
+		def redoNodeList():
+			for row in range(len(self.maze)): #--refresh the list of nodes before every node connection                          DO BETTER!!!!!!! ITS CRAP!!!! SLOW!!!! POOPOO!!!
 				for col in range(len(self.maze[0])):
 					if type(self.maze[row][col]) == NODE:
 						aSimpleNodes.append([row, col])
 
+			return aSimpleNodes
+
+		aSimpleNodes = redoNodeList()
+		print(aSimpleNodes)
+
+		nodesLeft = True
+		while nodesLeft == True:
+
+
+			# for item in self.maze[row][col].connections.items():
+			# 	print(item)
+
+			# if any(item[1] == True for item in self.maze[row][col].connections.items()): #--End loop when all nodes found and populated with connection coords
+			# 	nodesLeft = True
+			# else:
+			# 	nodesLeft = False
+
+
 			for nodePos in aSimpleNodes:
-				# print(nodePos)
-				self.maze = self.maze[nodePos[0]][nodePos[1]].findNodeConnections(self.maze)
+				self.maze, aSimpleNodes = self.maze[nodePos[0]][nodePos[1]].findNodeConnections(self.maze, aSimpleNodes)
+
+			for nodePos in aSimpleNodes:
+				print(any(item[1] == True for item in self.maze[nodePos[0]][nodePos[1]].connections.items()))
+				if any(item[1] == True for item in self.maze[nodePos[0]][nodePos[1]].connections.items()):
+					nodesLeft = True
+				else:
+					self.maze, aSimpleNodes = self.maze[nodePos[0]][nodePos[1]].findNodeConnections(self.maze, aSimpleNodes)
+					nodesLeft = False
+
+	def writeMazeNodes(self, aMaze, aMazeSolution):
+		#--Gets the maze width and height
+		w = len(aMaze[0])
+		h = len(aMaze)
+
+		data = np.zeros((h, w, 3), dtype=np.uint8) #--Creates a 3D array 3 deep with the length and width of the maze and fills it with 0s
+
+		for r in range(len(aMaze)):
+			for p in range(len(aMaze[r])):
+				#--For each space in the maze, get the value and assign each pixel an RGB value based on the value
+				if aMaze[r][p] == 0 and aMazeSolution[r][p] != 8:
+					data[r][p] = [255, 255, 255] #--RGB value to be written and coords to be written to
+
+				elif aMaze[r][p] == 1:
+					data[r][p] = [0, 0, 0]
+
+				elif type(aMaze[r][p]) == NODE:
+					data[r][p] = [0, 255, 0]
+
+				elif aMaze[r][p] == 3:
+					data[r][p] = [255, 0, 0]
+
+				else:
+					data[r][p] = [0, 0, 255]
+
+		img = Image.fromarray(data, "RGB") #--Construts an image from the array of RGB colour values
+		img.save("../Mazes/mazeWithNodes.png") #--Saves the image as solvedMaze.png
+		# img.show() #--Shows the image
 		
 
 	def main(self):
-		self.maze = self.getMaze("../Mazes/ManipulatingBadCode.png")
+		self.maze = getMaze("../Mazes/manipulatingBadCode.png")
 
 		self.maze = self.findStartEnd(self.maze)
 		
 		self.maze, aSimpleNodes = self.makeSimpleNodes(self.maze)
 		# print(aSimpleNodes)
-
+	
 		self.findNodeConnections(aSimpleNodes)
+
+		self.writeMazeNodes(self.maze, self.maze)
 
 
 class NODE():
@@ -148,7 +185,7 @@ class NODE():
 		"west" : cWest
 		}
 
-	def findNodeConnections(self, maze):
+	def findNodeConnections(self, maze, aSimpleNodes):
 
 		def nodeConnectDir(coord, maze=maze): #--Find out directions a node has connections.
 			cNorth = False
@@ -187,6 +224,7 @@ class NODE():
 						cNorth, cEast, cSouth, cWest = nodeConnectDir([currentPos[0], currentPos[1]])
 						maze[currentPos[0]][currentPos[1]] = NODE([currentPos[0], currentPos[1]], cNorth, cEast, cSouth, cWest)
 
+						aSimpleNodes.append([currentPos[0], currentPos[1]])
 						foundNode = True
 
 		if self.connections["south"] == True:
@@ -206,6 +244,7 @@ class NODE():
 						cNorth, cEast, cSouth, cWest = nodeConnectDir([currentPos[0], currentPos[1]])
 						maze[currentPos[0]][currentPos[1]] = NODE([currentPos[0], currentPos[1]], cNorth, cEast, cSouth, cWest)
 
+						aSimpleNodes.append([currentPos[0], currentPos[1]])
 						foundNode = True
 
 		if self.connections["east"] == True:
@@ -225,6 +264,7 @@ class NODE():
 						cNorth, cEast, cSouth, cWest = nodeConnectDir([currentPos[0], currentPos[1]])
 						maze[currentPos[0]][currentPos[1]] = NODE([currentPos[0], currentPos[1]], cNorth, cEast, cSouth, cWest)
 
+						aSimpleNodes.append([currentPos[0], currentPos[1]])
 						foundNode = True
 
 		if self.connections["west"] == True:
@@ -244,8 +284,10 @@ class NODE():
 						cNorth, cEast, cSouth, cWest = nodeConnectDir([currentPos[0], currentPos[1]])
 						maze[currentPos[0]][currentPos[1]] = NODE([currentPos[0], currentPos[1]], cNorth, cEast, cSouth, cWest)
 
+						aSimpleNodes.append([currentPos[0], currentPos[1]])
 						foundNode = True
 
+		return maze, aSimpleNodes
 
 
 
@@ -256,4 +298,11 @@ solve = MAZE()
 newMaze = solve.main()
 solve.mprint(solve.maze)
 # solve.mprint(newMaze)
-# print(solve.maze[1][6].connections["west"])
+
+
+# aSimpleNodes = [[1, 1], [18, 23], [0, 1], [1, 1], [18, 23], [19, 23]]
+# for nodePos in aSimpleNodes:
+# 	print(any(item[1] == True for item in solve.maze[nodePos[0]][nodePos[1]].connections.items()))
+
+# print(any(item[1] == True for item in solve.maze[-2][1].connections.items()))
+print(solve.maze[3][3].connections["south"])
