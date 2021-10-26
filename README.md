@@ -1,7 +1,7 @@
 # Maze-solver
 solves/makes mazes
 
-#Maze Requirements
+### Maze Requirements
 
 mazes should only have 1 pixel wide white paths, and black walls
 the emtrance should be on the top, and the exit should be on the bottom
