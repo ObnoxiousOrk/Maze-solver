@@ -1,5 +1,5 @@
 # Maze-solver
-solves/makes mazes
+solves/makes mazes (doesnt actually make mazes, cos i been busy or whatever)
 
 ### Maze Requirements
 
